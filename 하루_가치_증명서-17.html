@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Testimonium Vitae</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap');
+:root{--bg:#0f0f13;--s:#1a1a22;--s2:#22222e;--b:#2e2e3e;--a:#7c6dfa;--a2:#fa6d8a;--g:#f5c842;--gr:#4ade80;--r:#f87171;--bl:#60a5fa;--t:#e8e8f0;--t2:#8888a8;--t3:#55556a;--rad:12px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR',sans-serif;min-height:100vh;padding-bottom:80px;max-width:480px;margin:0 auto;}
+.nav{display:flex;border-bottom:1px solid var(--b);background:var(--s);position:sticky;top:0;z-index:100;}
+.nav-tab{flex:1;padding:14px 8px;text-align:center;font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;}
+.nav-tab.active{color:var(--a);border-bottom-color:var(--a);}
+.page{display:none;padding:16px;}
+.page.active{display:block;}
+h1{font-size:20px;font-weight:700;text-align:center;margin-bottom:4px;}
+.sub{font-size:11px;color:var(--t2);text-align:center;margin-bottom:16px;}
+.date-str{font-family:'Space Mono',monospace;font-size:10px;color:var(--t3);letter-spacing:.15em;text-align:center;margin-bottom:6px;}
+
+/* Card */
+.card{background:var(--s);border:1px solid var(--b);border-radius:var(--rad);padding:14px 16px;margin-bottom:12px;}
+.card-title{font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.tag{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500;}
+.tag-study{background:#2a2060;color:var(--a);}
+.tag-life{background:#1a2a20;color:var(--gr);}
+.tag-neutral{background:#1e1e2a;color:var(--t2);}
+.tag-waste{background:#2a1010;color:var(--r);}
+
+/* Score ring */
+.ring-wrap{position:relative;width:150px;height:150px;margin:0 auto 10px;}
+.ring-wrap svg{transform:rotate(-90deg);}
+.ring-bg{fill:none;stroke:var(--s2);stroke-width:12;}
+.ring-fill{fill:none;stroke-width:12;stroke-linecap:round;stroke-dasharray:377;stroke-dashoffset:377;transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1),stroke .4s;}
+.ring-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.score-num{font-family:'Space Mono',monospace;font-size:32px;font-weight:700;line-height:1;}
+.score-lbl{font-size:9px;color:var(--t2);margin-top:3px;letter-spacing:.1em;}
+.grade-badge{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;padding:5px 16px;border-radius:20px;display:block;text-align:center;margin-bottom:10px;}
+.breakdown{display:flex;gap:6px;}
+.brk{flex:1;text-align:center;background:var(--s);border:1px solid var(--b);border-radius:10px;padding:7px 4px;}
+.brk-v{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;}
+.brk-l{font-size:10px;color:var(--t2);margin-top:2px;}
+.warn{font-size:11px;color:var(--r);background:#1a0a0a;border-radius:8px;padding:7px 10px;margin-top:8px;text-align:center;display:none;}
+
+/* Sleep */
+.sleep-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.sleep-inp-wrap{background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:8px 10px;}
+.sleep-inp-lbl{font-size:10px;color:var(--t2);margin-bottom:4px;}
+.sleep-inp{width:100%;background:transparent;border:none;color:var(--t);font-size:14px;font-family:'Space Mono',monospace;outline:none;}
+.sleep-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--s2);border-radius:8px;margin-bottom:8px;}
+.sleep-row-lbl{font-size:11px;color:var(--t2);}
+.sleep-row-val{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;}
+.streak-row{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--s2);border-radius:8px;margin-bottom:10px;}
+.streak-info{flex:1;}
+.streak-count{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--g);}
+.streak-lbl{font-size:10px;color:var(--t2);margin-top:2px;}
+.streak-next{font-size:11px;color:var(--a);margin-top:2px;}
+.chk-title{font-size:11px;font-weight:700;color:var(--t2);margin-bottom:8px;letter-spacing:.05em;}
+.chk-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--b);cursor:pointer;user-select:none;}
+.chk-item:last-child{border-bottom:none;}
+.chk-box{width:22px;height:22px;border-radius:6px;border:1px solid var(--b);background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .15s;flex-shrink:0;}
+.chk-box.on{background:var(--a);border-color:var(--a);}
+.chk-lbl{font-size:12px;color:var(--t);flex:1;}
+.chk-pts{font-family:'Space Mono',monospace;font-size:10px;color:var(--g);}
+.comp-warn{font-size:11px;padding:6px 10px;border-radius:8px;margin-top:8px;text-align:center;display:none;}
+
+/* Hora */
+.hora-banner{border-radius:var(--rad);padding:12px 16px;margin-bottom:12px;text-align:center;border:1px solid var(--b);}
+.hora-name{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;letter-spacing:.05em;}
+.hora-time{font-size:11px;margin-top:3px;opacity:.7;}
+.hora-bonus{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;margin-top:6px;}
+.start-btn{display:block;width:100%;padding:11px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-top:10px;}
+.start-recorded{font-size:11px;margin-top:8px;display:none;}
+
+/* Session */
+.session-goals{display:flex;gap:8px;margin-bottom:10px;}
+.goal-pill{flex:1;text-align:center;padding:7px;border-radius:8px;font-size:11px;font-weight:600;}
+.goal-min{background:#102018;border:1px solid var(--gr);color:var(--gr);}
+.goal-chal{background:#1a1040;border:1px solid var(--a);color:var(--a);}
+.session-dots{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px;}
+.s-dot{width:28px;height:28px;border-radius:6px;background:var(--s2);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:9px;color:var(--t3);}
+.s-dot.done{background:linear-gradient(135deg,var(--a),var(--a2));border-color:transparent;color:white;}
+.s-dot.partial{background:#2a2060;border-color:var(--a);color:var(--a);}
+.pomo-row{display:flex;gap:4px;}
+.pomo-dot{width:10px;height:10px;border-radius:50%;background:var(--s2);border:1px solid var(--b);}
+.pomo-dot.done{background:var(--a2);}
+
+/* Day type */
+.day-btns{display:flex;gap:6px;margin-bottom:8px;}
+.day-btn{flex:1;padding:8px 4px;text-align:center;background:var(--s2);border:1px solid var(--b);border-radius:8px;cursor:pointer;font-size:11px;font-weight:600;color:var(--t2);transition:all .2s;font-family:'Noto Sans KR',sans-serif;}
+.day-btn.work.on{background:#1a2040;border-color:var(--bl);color:var(--bl);}
+.day-btn.special.on{background:#1a1540;border-color:var(--a);color:var(--a);}
+.day-btn.buffer.on{background:#102018;border-color:var(--gr);color:var(--gr);}
+.thr-info{font-size:11px;color:var(--t2);padding:6px 10px;background:var(--s2);border-radius:6px;}
+
+/* Activity */
+.act-item{border-bottom:1px solid var(--b);padding:10px 0;}
+.act-item:last-child{border-bottom:none;padding-bottom:0;}
+.act-name{font-size:13px;font-weight:500;margin-bottom:3px;}
+.act-desc{font-size:11px;color:var(--t2);margin-bottom:8px;}
+.imp-row{display:grid;grid-template-columns:56px 1fr auto;align-items:center;gap:8px;margin-bottom:4px;}
+.imp-row:last-child{margin-bottom:0;}
+.imp-lbl{font-size:11px;font-weight:600;padding:3px 6px;border-radius:6px;text-align:center;}
+.imp-lbl.high{background:#2a1a4a;color:var(--a);}
+.imp-lbl.mid{background:#2a2210;color:var(--g);}
+.imp-lbl.low{background:#102a18;color:var(--gr);}
+.imp-lbl.neutral{background:var(--s2);color:var(--t2);}
+.imp-lbl.waste-lbl{background:#2a1010;color:var(--r);}
+.time-inp{display:flex;align-items:center;gap:3px;background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:3px 6px;}
+.t-btn{background:none;border:none;color:var(--t2);cursor:pointer;font-size:15px;padding:0 2px;line-height:1;}
+.t-val{font-family:'Space Mono',monospace;font-size:11px;color:var(--t);min-width:36px;text-align:center;cursor:pointer;}
+.a-pts{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;min-width:48px;text-align:right;white-space:nowrap;}
+.a-pts.pos{color:var(--g);}
+.a-pts.neg{color:var(--r);}
+.a-pts.zero{color:var(--t3);}
+.a-pts.ntrl{color:var(--t2);font-size:10px;}
+
+/* Waste total */
+.waste-total{background:#1a0a0a;border:1px solid #3a1a1a;border-radius:8px;padding:8px 12px;margin-top:10px;display:flex;justify-content:space-between;}
+.wt-lbl{font-size:12px;color:var(--t2);}
+.wt-val{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--r);}
+
+/* Moqigo */
+.moq-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.moq-lbl{font-size:12px;color:var(--t2);}
+.moq-cnt{font-family:'Space Mono',monospace;font-size:12px;color:var(--a);font-weight:700;}
+.moq-bar-bg{height:6px;background:var(--s2);border-radius:3px;overflow:hidden;margin-bottom:10px;}
+.moq-bar{height:100%;background:linear-gradient(90deg,var(--a),var(--a2));border-radius:3px;transition:width .5s;}
+.moq-dots{display:flex;flex-wrap:wrap;gap:4px;}
+.moq-dot{width:24px;height:24px;border-radius:6px;border:1px solid var(--b);background:var(--s2);cursor:pointer;font-family:'Space Mono',monospace;font-size:8px;color:var(--t3);display:flex;align-items:center;justify-content:center;font-weight:700;}
+.moq-dot.done{background:linear-gradient(135deg,var(--a),var(--a2));border-color:transparent;color:white;}
+
+/* Stats */
+.stat-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--b);}
+.stat-row:last-child{border-bottom:none;}
+.stat-n{font-size:12px;color:var(--t2);}
+.stat-v{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;}
+.stat-v.r{color:var(--r);}
+.stat-v.g{color:var(--g);}
+.stat-v.gr{color:var(--gr);}
+
+/* Buttons */
+.btn-main{display:block;width:100%;padding:13px;background:linear-gradient(135deg,var(--a),var(--a2));border:none;border-radius:var(--rad);color:white;font-size:14px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;margin-bottom:10px;}
+.btn-sub{display:block;width:100%;padding:11px;background:transparent;border:1px solid var(--b);border-radius:var(--rad);color:var(--t2);font-size:13px;font-weight:600;font-family:'Noto Sans KR',sans-serif;cursor:pointer;margin-bottom:12px;}
+.btn-sm{background:var(--a);border:none;border-radius:8px;color:white;font-size:11px;font-weight:700;padding:5px 10px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+.btn-acc{display:block;width:100%;padding:9px;background:var(--s2);border:1px solid var(--b);border-radius:8px;color:var(--t);font-size:12px;font-weight:600;font-family:'Noto Sans KR',sans-serif;cursor:pointer;margin-top:10px;}
+
+/* Graph */
+.graph-tabs{display:flex;gap:6px;margin-bottom:12px;}
+.g-tab{flex:1;padding:7px;background:var(--s2);border:1px solid var(--b);border-radius:8px;color:var(--t2);font-size:11px;font-weight:600;cursor:pointer;font-family:'Space Mono',monospace;letter-spacing:.05em;text-align:center;}
+.g-tab.active{background:#1e1840;border-color:var(--a);color:var(--a);}
+.g-wrap{position:relative;width:100%;height:180px;margin-bottom:8px;}
+.g-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;}
+.g-pill{background:var(--s2);border:1px solid var(--b);border-radius:8px;padding:8px;text-align:center;}
+.g-val{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--a);}
+.g-lbl{font-size:10px;color:var(--t2);margin-top:2px;}
+
+/* History */
+.hist-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--b);cursor:pointer;}
+.hist-item:last-child{border-bottom:none;}
+.hist-date{font-size:12px;color:var(--t2);}
+.hist-score{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;}
+.hist-grade{font-size:11px;color:var(--t2);margin-left:6px;}
+.hist-controls{display:flex;align-items:center;gap:8px;}
+.date-inp-sm{background:var(--s2);border:1px solid var(--b);border-radius:8px;color:var(--t);font-size:11px;padding:4px 8px;font-family:'Space Mono',monospace;outline:none;}
+
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;overflow-y:auto;padding:20px 16px;}
+.modal-box{background:var(--s);border:1px solid var(--b);border-radius:16px;max-width:440px;margin:0 auto;padding:18px;}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.modal-title{font-size:13px;font-weight:700;}
+.modal-close{background:var(--s2);border:1px solid var(--b);border-radius:8px;color:var(--t2);font-size:12px;padding:5px 12px;cursor:pointer;}
+.modal-score{text-align:center;margin-bottom:14px;}
+.modal-score-num{font-family:'Space Mono',monospace;font-size:30px;font-weight:700;}
+.modal-grade{font-size:12px;margin-top:6px;font-weight:600;}
+.modal-sec{font-size:11px;font-weight:700;color:var(--t2);letter-spacing:.08em;margin:10px 0 6px;}
+.modal-row{display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid var(--b);}
+.modal-row:last-child{border-bottom:none;}
+.modal-load-btn{display:block;width:100%;padding:11px;margin-top:14px;background:linear-gradient(135deg,var(--a),var(--a2));border:none;border-radius:10px;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+
+/* Time modal */
+.tmodal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;align-items:center;justify-content:center;}
+.tmodal-bg.show{display:flex;}
+.tmodal-box{background:var(--s);border:1px solid var(--b);border-radius:14px;padding:20px;width:260px;}
+.tmodal-title{font-size:13px;font-weight:700;margin-bottom:12px;}
+.tmodal-inp{width:100%;background:var(--s2);border:1px solid var(--b);border-radius:8px;color:var(--t);font-size:16px;padding:10px;font-family:'Space Mono',monospace;outline:none;text-align:center;margin-bottom:8px;}
+.tmodal-hint{font-size:11px;color:var(--t2);text-align:center;margin-bottom:12px;}
+.tmodal-btns{display:flex;gap:8px;}
+.tmodal-btn{flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:'Noto Sans KR',sans-serif;}
+.tmodal-btn.ok{background:var(--a);color:white;}
+.tmodal-btn.cancel{background:var(--s2);color:var(--t2);border:1px solid var(--b);}
+
+/* Settings */
+.set-sub{font-size:11px;color:var(--t2);margin-bottom:10px;}
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b);}
+.set-row:last-child{border-bottom:none;}
+.set-name{font-size:12px;}
+.set-desc{font-size:10px;color:var(--t2);margin-top:2px;}
+.set-inp{background:var(--s2);border:1px solid var(--b);border-radius:8px;color:var(--t);font-size:13px;padding:5px 10px;font-family:'Space Mono',monospace;outline:none;width:70px;text-align:center;}
+.set-grp-title{font-size:12px;font-weight:600;color:var(--t2);margin:12px 0 6px;}
+.hora-tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px;}
+.hora-tbl th{color:var(--t2);padding:5px 6px;text-align:left;border-bottom:1px solid var(--b);font-weight:600;}
+.hora-tbl td{padding:5px 6px;border-bottom:1px solid var(--b);}
+.hora-tbl tr:last-child td{border-bottom:none;}
+
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--s);border:1px solid var(--b);border-radius:20px;padding:9px 20px;font-size:12px;color:var(--t);transition:transform .3s;z-index:400;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.empty{text-align:center;padding:20px;color:var(--t3);font-size:12px;}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-tab active" id="tab-main">📋 오늘</div>
+  <div class="nav-tab" id="tab-history">📅 기록</div>
+  <div class="nav-tab" id="tab-settings">⚙️ 설정</div>
+</div>
+
+<!-- MAIN -->
+<div class="page active" id="page-main">
+  <div class="date-str" id="dateStr">LOADING...</div>
+  <h1>Testimonium Vitae</h1>
+  <div class="sub">하루 가치 증명서</div>
+
+  <!-- Sleep -->
+  <div class="card">
+    <div class="card-title">😴 수면 기록 <span class="streak-count" id="streakBadge" style="color:var(--g)">🔥 0일</span></div>
+    <div class="sleep-grid">
+      <div class="sleep-inp-wrap">
+        <div class="sleep-inp-lbl">어제 취침 시간</div>
+        <input type="time" class="sleep-inp" id="sleepTime">
+      </div>
+      <div class="sleep-inp-wrap">
+        <div class="sleep-inp-lbl">오늘 기상 시간</div>
+        <input type="time" class="sleep-inp" id="wakeTime">
+      </div>
+    </div>
+    <div class="sleep-row">
+      <span class="sleep-row-lbl">수면 시간</span>
+      <span class="sleep-row-val" id="sleepDur">—</span>
+    </div>
+    <div class="streak-row">
+      <span style="font-size:16px">🔥</span>
+      <div class="streak-info">
+        <div class="streak-count" id="streakCount">0일 연속</div>
+        <div class="streak-lbl">자정 전 취침 + 6시간 이상 수면</div>
+        <div class="streak-next" id="streakNext"></div>
+      </div>
+    </div>
+    <div class="chk-title">취침 루틴</div>
+    <div class="chk-item" id="chk-phone">
+      <div class="chk-box" id="box-phone"></div>
+      <span class="chk-lbl">📵 폰 내려놓기</span>
+      <span class="chk-pts">+3pt</span>
+    </div>
+    <div class="chk-item" id="chk-book">
+      <div class="chk-box" id="box-book"></div>
+      <span class="chk-lbl">📖 책 읽기</span>
+      <span class="chk-pts">+3pt</span>
+    </div>
+    <div class="chk-item" id="chk-prayer">
+      <div class="chk-box" id="box-prayer"></div>
+      <span class="chk-lbl">🙏 기도 / 목표 되새기기</span>
+      <span class="chk-pts">+4pt</span>
+    </div>
+    <div class="comp-warn" id="compWarn"></div>
+    <button class="btn-acc" id="btnSleepSave">수면 기록 저장</button>
+  </div>
+
+  <!-- Hora -->
+  <div class="hora-banner" id="horaBanner">
+    <div class="hora-name" id="horaName">—</div>
+    <div class="hora-time" id="horaTime">—</div>
+    <div class="hora-bonus" id="horaBonus">—</div>
+    <button class="start-btn" id="btnStart">🌅 공부 시작 기록하기</button>
+    <div class="start-recorded" id="startRec"></div>
+  </div>
+
+  <!-- Score -->
+  <div class="card" style="text-align:center;">
+    <div class="ring-wrap">
+      <svg width="150" height="150" viewBox="0 0 150 150">
+        <circle class="ring-bg" cx="75" cy="75" r="60"/>
+        <circle class="ring-fill" id="ringFill" cx="75" cy="75" r="60"/>
+      </svg>
+      <div class="ring-center">
+        <div class="score-num" id="scoreNum">0</div>
+        <div class="score-lbl">TODAY SCORE</div>
+      </div>
+    </div>
+    <div class="grade-badge" id="gradeBadge">— 기록 없음 —</div>
+    <div class="breakdown">
+      <div class="brk"><div class="brk-v" id="brkPlus" style="color:var(--gr)">+0</div><div class="brk-l">획득</div></div>
+      <div class="brk"><div class="brk-v" id="brkHora" style="color:var(--g)">±0</div><div class="brk-l">Hora</div></div>
+      <div class="brk"><div class="brk-v" id="brkMinus" style="color:var(--r)">−0</div><div class="brk-l">낭비</div></div>
+      <div class="brk"><div class="brk-v" id="brkTotal" style="color:var(--g)">0</div><div class="brk-l">최종</div></div>
+    </div>
+    <div class="warn" id="warnMsg"></div>
+  </div>
+
+  <!-- Session -->
+  <div class="card">
+    <div class="card-title">🍅 뽀모도로 세션 <span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--a)" id="sessionCnt">0세트 완료</span></div>
+    <div class="session-goals">
+      <div class="goal-pill goal-min">최소 <span id="minGoal">2</span>세트</div>
+      <div class="goal-pill goal-chal">도전 <span id="chalGoal">—</span>세트</div>
+    </div>
+    <div class="session-dots" id="sessionDots"></div>
+    <div class="pomo-row" id="pomoRow"></div>
+  </div>
+
+  <!-- Day type -->
+  <div class="card">
+    <div style="font-size:11px;color:var(--t2);margin-bottom:8px;">오늘 하루 유형</div>
+    <div class="day-btns">
+      <div class="day-btn work" id="btnWork">💼 근무일</div>
+      <div class="day-btn special" id="btnSpecial">✨ 특별한 날</div>
+      <div class="day-btn buffer" id="btnBuffer">🌿 버퍼</div>
+    </div>
+    <div class="thr-info" id="thrInfo">공부 기준: 11시간 (일 없는 날)</div>
+  </div>
+
+  <!-- Date -->
+  <div class="card" style="display:flex;align-items:center;gap:12px;padding:10px 16px;">
+    <span style="font-size:11px;color:var(--t2);">기록 날짜</span>
+    <input type="date" id="recordDate" style="flex:1;background:var(--s2);border:1px solid var(--b);border-radius:8px;color:var(--t);font-size:13px;padding:6px 10px;font-family:'Space Mono',monospace;outline:none;">
+  </div>
+
+  <!-- Moqigo -->
+  <div class="card">
+    <div class="card-title">📋 모의고사 <span class="tag tag-study">정처기</span></div>
+    <div class="moq-hdr"><span class="moq-lbl">완료 회차</span><span class="moq-cnt"><span id="moqCnt">0</span>/23회</span></div>
+    <div class="moq-bar-bg"><div class="moq-bar" id="moqBar" style="width:0%"></div></div>
+    <div class="moq-dots" id="moqDots"></div>
+  </div>
+
+  <!-- Study -->
+  <div class="card">
+    <div class="card-title">💻 공부 <span class="tag tag-study">지식 축적</span></div>
+    <div id="studyActs"></div>
+  </div>
+
+  <!-- Life -->
+  <div class="card">
+    <div class="card-title">🌱 정신건강 <span class="tag tag-life">삶의 질</span></div>
+    <div id="lifeActs"></div>
+  </div>
+
+  <!-- Neutral -->
+  <div class="card">
+    <div class="card-title">⏱️ 필수 시간 <span class="tag tag-neutral">기록만</span></div>
+    <div id="neutralActs"></div>
+  </div>
+
+  <!-- Waste -->
+  <div class="card">
+    <div class="card-title">📵 낭비 시간 <span class="tag tag-waste">차감</span></div>
+    <div id="wasteActs"></div>
+    <div class="waste-total"><span class="wt-lbl">총 차감</span><span class="wt-val" id="wasteTot">−0pt</span></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="card">
+    <div class="card-title">📊 오늘 통계</div>
+    <div class="stat-row"><span class="stat-n">공부 시간</span><span class="stat-v" id="stStudy">0분</span></div>
+    <div class="stat-row"><span class="stat-n">정신건강 시간</span><span class="stat-v" id="stLife">0분</span></div>
+    <div class="stat-row"><span class="stat-n">필수 시간</span><span class="stat-v" id="stNeutral">0분</span></div>
+    <div class="stat-row"><span class="stat-n">낭비 시간</span><span class="stat-v r" id="stWaste">0분</span></div>
+    <div class="stat-row"><span class="stat-n">Hora 보너스</span><span class="stat-v g" id="stHora">+0pt</span></div>
+    <div class="stat-row"><span class="stat-n">모의고사 보너스</span><span class="stat-v" id="stMoq">0pt</span></div>
+    <div class="stat-row"><span class="stat-n">낭비 차감</span><span class="stat-v r" id="stLost">−0pt</span></div>
+  </div>
+
+  <button class="btn-main" id="btnSave">💾 저장하기</button>
+  <button class="btn-sub" id="btnReset">🔄 새 하루 시작 (초기화)</button>
+
+  <!-- Graph -->
+  <div class="card">
+    <div class="card-title">📈 성장 그래프</div>
+    <div class="graph-tabs">
+      <div class="g-tab active" id="tabWeekly">WEEKLY</div>
+      <div class="g-tab" id="tabMonthly">MONTHLY</div>
+    </div>
+    <div class="g-wrap"><canvas id="graphCanvas"></canvas></div>
+    <div class="g-summary">
+      <div class="g-pill"><div class="g-val" id="gAvg">—</div><div class="g-lbl">평균</div></div>
+      <div class="g-pill"><div class="g-val" id="gMax">—</div><div class="g-lbl">최고</div></div>
+      <div class="g-pill"><div class="g-val" id="gDays">—</div><div class="g-lbl">기록한 날</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div class="page" id="page-history">
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title">
+      📅 지난 기록
+      <div class="hist-controls">
+        <input type="date" class="date-inp-sm" id="loadDate">
+        <button class="btn-sm" id="btnLoad">불러오기</button>
+      </div>
+    </div>
+    <div id="historyList"><div class="empty">불러오는 중...</div></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="page" id="page-settings">
+  <div class="card" style="margin-top:16px;">
+    <div class="card-title">🕐 Hora — 시작 시간 보너스</div>
+    <table class="hora-tbl">
+      <thead><tr><th>시간대</th><th>이름</th><th>일반</th><th>근무/특별</th></tr></thead>
+      <tbody>
+        <tr><td>04~09시</td><td style="color:var(--g)">Laudes</td><td style="color:var(--gr)">+30pt</td><td style="color:var(--gr)">+30pt</td></tr>
+        <tr><td>09~12시</td><td style="color:var(--a)">Tertia</td><td style="color:var(--a)">+15pt</td><td style="color:var(--a)">+15pt</td></tr>
+        <tr><td>12~15시</td><td style="color:var(--bl)">Sexta</td><td style="color:var(--bl)">+5pt</td><td style="color:var(--bl)">+5pt</td></tr>
+        <tr><td>15~18시</td><td>Nona</td><td>0pt</td><td>0pt</td></tr>
+        <tr><td>18~21시</td><td>Vesper</td><td>0pt</td><td>0pt</td></tr>
+        <tr><td>21~04시</td><td style="color:var(--r)">Completorium</td><td>0pt</td><td style="color:var(--r)">−10pt</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card">
+    <div class="card-title">📈 점진적 과부하 설정</div>
+    <div class="set-sub">이번 주 목표 세트 수를 직접 설정해줘.</div>
+    <div class="set-grp-title">일 없는 날</div>
+    <div class="set-row"><div><div class="set-name">최소 목표</div><div class="set-desc">이것만 해도 오늘 성공</div></div><input type="number" class="set-inp" id="setMinN" value="2" min="1" max="20"></div>
+    <div class="set-row"><div><div class="set-name">도전 목표</div></div><input type="number" class="set-inp" id="setChalN" value="8" min="1" max="30"></div>
+    <div class="set-grp-title">근무일</div>
+    <div class="set-row"><div><div class="set-name">최소 목표</div></div><input type="number" class="set-inp" id="setMinW" value="1" min="1" max="20"></div>
+    <div class="set-row"><div><div class="set-name">도전 목표</div></div><input type="number" class="set-inp" id="setChalW" value="4" min="1" max="20"></div>
+    <div class="set-grp-title">특별한 날</div>
+    <div class="set-row"><div><div class="set-name">최소 목표</div></div><input type="number" class="set-inp" id="setMinS" value="1" min="1" max="20"></div>
+    <div class="set-row"><div><div class="set-name">도전 목표</div></div><input type="number" class="set-inp" id="setChalS" value="3" min="1" max="20"></div>
+    <button class="btn-main" id="btnSaveSettings" style="margin-top:12px;">설정 저장</button>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-bg" id="detailModal">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modalDate">—</div>
+      <button class="modal-close" id="btnModalClose">닫기</button>
+    </div>
+    <div class="modal-score">
+      <div class="modal-score-num" id="modalScore">0</div>
+      <div class="modal-grade" id="modalGrade">—</div>
+    </div>
+    <div id="modalContent"></div>
+    <button class="modal-load-btn" id="btnModalLoad">✏️ 이날 기록 불러와서 수정하기</button>
+  </div>
+</div>
+
+<!-- Time Modal -->
+<div class="tmodal-bg" id="timeModal">
+  <div class="tmodal-box">
+    <div class="tmodal-title" id="tmodalTitle">시간 직접 입력</div>
+    <input type="number" class="tmodal-inp" id="tmodalInp" placeholder="분" min="0" step="5">
+    <div class="tmodal-hint">예: 50 = 50분 / 90 = 1시간 30분</div>
+    <div class="tmodal-btns">
+      <button class="tmodal-btn cancel" id="btnTmodalCancel">취소</button>
+      <button class="tmodal-btn ok" id="btnTmodalOk">확인</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+import{getFirestore,doc,setDoc,getDoc,collection,getDocs,orderBy,query,limit}from"https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+const FC={apiKey:"AIzaSyDnT53WUn77l8nnSTA0Z1BVmk4wNvblM-8",authDomain:"testimoniumvitae.firebaseapp.com",projectId:"testimoniumvitae",storageBucket:"testimoniumvitae.firebasestorage.app",messagingSenderId:"1046870826394",appId:"1:1046870826394:web:92b074b538e4f9ac1cee23"};
+const app=initializeApp(FC);const db=getFirestore(app);
+const fbSet=async(k,v)=>{try{await setDoc(doc(db,'days',k),v);return true;}catch{return false;}};
+const fbGet=async(k)=>{try{const s=await getDoc(doc(db,'days',k));return s.exists()?s.data():null;}catch{return null;}};
+const fbList=async()=>{try{const q=query(collection(db,'days'),orderBy('date','desc'),limit(60));const s=await getDocs(q);return s.docs.map(d=>d.data());}catch{return[];}};
+
+// ─── 데이터 ─────────────────────────────────────
+const SA=[
+  {id:'moqigo',name:'정처기 모의고사',desc:'모의고사 풀이 + 해설',base:15},
+  {id:'concept',name:'정처기 개념 공부',desc:'특강, 개념 선행',base:12},
+  {id:'book',name:'코딩 관련 독서',desc:'깊이 탐구용 읽기',base:10},
+  {id:'spring',name:'스프링부트 공부',desc:'개발 실습',base:10},
+];
+const LA=[
+  {id:'exercise',name:'운동',desc:'몸과 뇌를 깨우는 시간',base:8},
+  {id:'guitar',name:'기타 연습',desc:'손끝에서 나오는 집중',base:6},
+  {id:'song',name:'노래',desc:'감정을 정리하는 시간',base:5},
+  {id:'meditation',name:'명상 / 기도',desc:'내면의 정박',base:7},
+  {id:'language',name:'언어교환',desc:'외국인과의 대화',base:6},
+  {id:'social',name:'인간관계 소통과 교류',desc:'통화, 사교모임, 데이트 등',base:5},
+  {id:'cleaning',name:'방 청소',desc:'공간이 정리되면 마음도 정리돼',base:5},
+];
+const NA=[
+  {id:'commute',name:'이동 시간',desc:'출퇴근, 이동'},
+  {id:'shower',name:'샤워',desc:'몸을 정돈하는 시간'},
+  {id:'plant',name:'식물 관리',desc:'물주기, 분갈이, 비료'},
+];
+const WA=[
+  {id:'phone',name:'폰 / 유튜브',desc:'무의미한 스크롤',p30:8},
+  {id:'shopping',name:'쇼핑 / 충동소비',desc:'필요 없는 탐색',p30:6},
+  {id:'etc',name:'기타 낭비',desc:'빈둥거림',p30:5},
+];
+const IMP=['high','mid','low'];
+const IMULT={high:1.8,mid:1.2,low:0.7};
+const ILBL={high:'핵심',mid:'보통',low:'가볍게'};
+const MAX=300;
+const THR={normal:660,work:210,special:210,buffer:0};
+const HORAS=[
+  {name:'Laudes',s:4,e:9,b:{normal:30,work:30,special:30,buffer:0},c:'#f5c842',bg:'#2a2010',bd:'#f5c84240'},
+  {name:'Tertia',s:9,e:12,b:{normal:15,work:15,special:15,buffer:0},c:'#7c6dfa',bg:'#1a1040',bd:'#7c6dfa40'},
+  {name:'Sexta',s:12,e:15,b:{normal:5,work:5,special:5,buffer:0},c:'#60a5fa',bg:'#101828',bd:'#60a5fa40'},
+  {name:'Nona',s:15,e:18,b:{normal:0,work:0,special:0,buffer:0},c:'#8888a8',bg:'#1a1a22',bd:'#2e2e3e'},
+  {name:'Vesper',s:18,e:21,b:{normal:0,work:0,special:0,buffer:0},c:'#8888a8',bg:'#1a1a22',bd:'#2e2e3e'},
+  {name:'Completorium',s:21,e:28,b:{normal:0,work:-10,special:-10,buffer:0},c:'#f87171',bg:'#1a0808',bd:'#f8717140'},
+];
+const SMILESTONE={3:20,7:50,14:100,30:200};
+
+// ─── 상태 ───────────────────────────────────────
+let dayType='normal';
+let startHora=null;
+let startTimeStr=null;
+let sets={minN:2,chalN:8,minW:1,chalW:4,minS:1,chalS:3};
+let checks={phone:false,book:false,prayer:false};
+let streak=0,lastStreakDate=null,streakApplied=[];
+let sleepTime=null,wakeTime=null;
+let modalRec=null;
+let tmodalTarget=null;
+let graphMode='weekly';
+let cachedHistory=[];
+let st={
+  moqDone:[],
+  sa:{},la:{},na:{},wa:{},
+};
+SA.forEach(a=>{st.sa[a.id]={high:0,mid:0,low:0};});
+LA.forEach(a=>{st.la[a.id]={high:0,mid:0,low:0};});
+NA.forEach(a=>{st.na[a.id]={mins:0};});
+WA.forEach(a=>{st.wa[a.id]={mins:0};});
+
+// ─── 유틸 ───────────────────────────────────────
+const $ = id => document.getElementById(id);
+function localDate(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function yesterday(){const d=new Date();d.setDate(d.getDate()-1);return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function grade(s){
+  if(s>=250)return{t:'🏆 전설적인 하루',c:'#f5c842',bg:'#2a2010'};
+  if(s>=200)return{t:'⭐ 훌륭한 하루',c:'#7c6dfa',bg:'#1a1040'};
+  if(s>=150)return{t:'✅ 의미있는 하루',c:'#4ade80',bg:'#102018'};
+  if(s>=80)return{t:'📝 괜찮은 하루',c:'#60a5fa',bg:'#101828'};
+  if(s>0)return{t:'🌱 시작한 하루',c:'#8888a8',bg:'#1a1a22'};
+  return{t:'— 기록 없음 —',c:'#55556a',bg:'#1a1a22'};
+}
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function getHora(){const h=new Date().getHours();const adj=h<4?h+24:h;return HORAS.find(hr=>adj>=hr.s&&adj<hr.e)||HORAS[4];}
+
+// ─── 탭 ─────────────────────────────────────────
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  $('page-'+name).classList.add('active');
+  $('tab-'+name).classList.add('active');
+  if(name==='history')loadHistory();
+}
+$('tab-main').addEventListener('click',()=>showPage('main'));
+$('tab-history').addEventListener('click',()=>showPage('history'));
+$('tab-settings').addEventListener('click',()=>showPage('settings'));
+
+// ─── Hora ────────────────────────────────────────
+function updateHora(){
+  const h=getHora();
+  const b=h.b[dayType]||0;
+  const banner=$('horaBanner');
+  banner.style.background=h.bg;banner.style.borderColor=h.bd;
+  $('horaName').textContent=h.name;$('horaName').style.color=h.c;
+  $('horaTime').textContent=`${h.s%24}:00 ~ ${h.e%24||0}:00`;
+  const bEl=$('horaBonus');
+  bEl.textContent=b>0?`+${b}pt 보너스`:b<0?`${b}pt 페널티`:'보너스 없음';
+  bEl.style.color=b>0?'#4ade80':b<0?'#f87171':'#8888a8';
+  $('btnStart').style.background=h.c;$('btnStart').style.color=h.bg;
+}
+$('btnStart').addEventListener('click',()=>{
+  if(startHora){toast('이미 시작 시간이 기록됐어!');return;}
+  const h=getHora();startHora=h;
+  const now=new Date().toLocaleString('ko-KR',{timeZone:'Asia/Seoul'});startTimeStr=now;
+  $('btnStart').style.display='none';
+  const rec=$('startRec');
+  rec.textContent=`${h.name} · ${now} · ${(h.b[dayType]||0)>=0?'+':''}${h.b[dayType]||0}pt`;
+  rec.style.display='block';rec.style.color=h.c;
+  calcScore();toast(`${h.name} — 공부 시작! 💪`);
+});
+setInterval(updateHora,60000);
+
+// ─── Day type ────────────────────────────────────
+function setDayType(t){
+  dayType=dayType===t?'normal':t;
+  ['work','special','buffer'].forEach(x=>$('btn'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('on',dayType===x));
+  const lbl={normal:'공부 기준: 11시간 (일 없는 날)',work:'공부 기준: 3시간 30분 (근무일)',special:'공부 기준: 3시간 30분 (특별한 날)',buffer:'버퍼 / 휴식 — 기준 없음'};
+  $('thrInfo').textContent=lbl[dayType];
+  updateHora();updateSessionUI();calcScore();
+}
+$('btnWork').addEventListener('click',()=>setDayType('work'));
+$('btnSpecial').addEventListener('click',()=>setDayType('special'));
+$('btnBuffer').addEventListener('click',()=>setDayType('buffer'));
+
+// ─── Session ─────────────────────────────────────
+function studyMinsTotal(){let t=0;SA.forEach(a=>IMP.forEach(i=>{t+=st.sa[a.id][i];}));return t;}
+function sessionCount(){return Math.floor(studyMinsTotal()/100);}
+function pomoCur(){return Math.floor((studyMinsTotal()%100)/25);}
+function getMinGoal(){return dayType==='work'?sets.minW:dayType==='special'?sets.minS:sets.minN;}
+function getChalGoal(){return dayType==='work'?sets.chalW:dayType==='special'?sets.chalS:sets.chalN;}
+function updateSessionUI(){
+  const cnt=sessionCount(),pomo=pomoCur(),mn=getMinGoal(),ch=getChalGoal();
+  $('sessionCnt').textContent=`${cnt}세트 완료`;
+  $('minGoal').textContent=mn;$('chalGoal').textContent=ch;
+  const dots=$('sessionDots');dots.innerHTML='';
+  for(let i=1;i<=Math.max(ch,cnt);i++){
+    const d=document.createElement('div');d.className='s-dot'+(i<=cnt?' done':i===cnt+1&&pomo>0?' partial':'');d.textContent=i;dots.appendChild(d);
+  }
+  const pr=$('pomoRow');pr.innerHTML='';
+  for(let i=0;i<4;i++){const d=document.createElement('div');d.className='pomo-dot'+(i<pomo?' done':'');pr.appendChild(d);}
+}
+
+// ─── Moqigo ──────────────────────────────────────
+function renderMoq(){
+  const w=$('moqDots');w.innerHTML='';
+  for(let i=1;i<=23;i++){
+    const d=document.createElement('div');
+    d.className='moq-dot'+(st.moqDone.includes(i)?' done':'');
+    d.textContent=i;
+    d.addEventListener('click',()=>{
+      const idx=st.moqDone.indexOf(i);
+      if(idx>=0)st.moqDone.splice(idx,1);else st.moqDone.push(i);
+      renderMoq();calcScore();
+    });
+    w.appendChild(d);
+  }
+  $('moqCnt').textContent=st.moqDone.length;
+  $('moqBar').style.width=(st.moqDone.length/23*100)+'%';
+}
+
+// ─── Activities ──────────────────────────────────
+function calcPts(base,mins,imp){if(!mins)return 0;return Math.round(base*IMULT[imp]*Math.min(mins/60,3));}
+function makeTval(val,cb){
+  const span=document.createElement('span');span.className='t-val';span.textContent=val+'분';
+  span.addEventListener('click',cb);return span;
+}
+function makeTimeRow(label,labelClass,mins,onMinus,onPlus,onDirect,pts,ptsClass){
+  const row=document.createElement('div');row.className='imp-row';
+  const lbl=document.createElement('span');lbl.className='imp-lbl '+labelClass;lbl.textContent=label;
+  const ti=document.createElement('div');ti.className='time-inp';
+  const mb=document.createElement('button');mb.className='t-btn';mb.textContent='−';mb.addEventListener('click',onMinus);
+  const tv=document.createElement('span');tv.className='t-val';tv.textContent=mins+'분';tv.addEventListener('click',onDirect);
+  const pb=document.createElement('button');pb.className='t-btn';pb.textContent='+';pb.addEventListener('click',onPlus);
+  ti.append(mb,tv,pb);
+  const pEl=document.createElement('span');pEl.className='a-pts '+ptsClass;pEl.textContent=pts;
+  row.append(lbl,ti,pEl);
+  return{row,tv,pEl};
+}
+function renderActs(){
+  // Study
+  const sw=$('studyActs');sw.innerHTML='';
+  SA.forEach(act=>{
+    const wrap=document.createElement('div');wrap.className='act-item';
+    const nm=document.createElement('div');nm.className='act-name';nm.textContent=act.name;
+    const ds=document.createElement('div');ds.className='act-desc';ds.textContent=act.desc;
+    wrap.append(nm,ds);
+    IMP.forEach(imp=>{
+      const mins=st.sa[act.id][imp];
+      const pts=calcPts(act.base,mins,imp);
+      const{row,tv,pEl}=makeTimeRow(
+        ILBL[imp],imp,mins,
+        ()=>{st.sa[act.id][imp]=Math.max(0,st.sa[act.id][imp]-25);tv.textContent=st.sa[act.id][imp]+'분';const p=calcPts(act.base,st.sa[act.id][imp],imp);pEl.textContent=p>0?'+'+p+'pt':'0pt';pEl.className='a-pts '+(p>0?'pos':'zero');updateSessionUI();calcScore();},
+        ()=>{st.sa[act.id][imp]+=25;tv.textContent=st.sa[act.id][imp]+'분';const p=calcPts(act.base,st.sa[act.id][imp],imp);pEl.textContent=p>0?'+'+p+'pt':'0pt';pEl.className='a-pts '+(p>0?'pos':'zero');updateSessionUI();calcScore();},
+        ()=>openTmodal(act.name+'('+ILBL[imp]+')',st.sa[act.id][imp],v=>{st.sa[act.id][imp]=Math.max(0,v);tv.textContent=st.sa[act.id][imp]+'분';const p=calcPts(act.base,st.sa[act.id][imp],imp);pEl.textContent=p>0?'+'+p+'pt':'0pt';pEl.className='a-pts '+(p>0?'pos':'zero');updateSessionUI();calcScore();}),
+        pts>0?'+'+pts+'pt':'0pt',pts>0?'pos':'zero'
+      );
+      wrap.appendChild(row);
+    });
+    sw.appendChild(wrap);
+  });
+  // Life
+  const lw=$('lifeActs');lw.innerHTML='';
+  LA.forEach(act=>{
+    const wrap=document.createElement('div');wrap.className='act-item';
+    const nm=document.createElement('div');nm.className='act-name';nm.textContent=act.name;
+    const ds=document.createElement('div');ds.className='act-desc';ds.textContent=act.desc;
+    wrap.append(nm,ds);
+    IMP.forEach(imp=>{
+      const mins=st.la[act.id][imp];
+      const pts=calcPts(act.base,mins,imp);
+      const{row,tv,pEl}=makeTimeRow(
+        ILBL[imp],imp,mins,
+        ()=>{st.la[act.id][imp]=Math.max(0,st.la[act.id][imp]-25);tv.textContent=st.la[act.id][imp]+'분';const p=calcPts(act.base,st.la[act.id][imp],imp);pEl.textContent=p>0?'+'+p+'pt':'0pt';pEl.className='a-pts '+(p>0?'pos':'zero');calcScore();},
+        ()=>{st.la[act.id][imp]+=25;tv.textContent=st.la[act.id][imp]+'분';const p=calcPts(act.base,st.la[act.id][imp],imp);pEl.textContent=p>0?'+'+p+'pt':'0pt';pEl.className='a-pts '+(p>0?'pos':'zero');calcScore();},
+        ()=>openTmodal(act.name+'('+ILBL[imp]+')',st.la[act.id][imp],v=>{st.la[act.id][imp]=Math.max(0,v);tv.textContent=st.la[act.id][imp]+'분';const p=calcPts(act.base,st.la[act.id][imp],imp);pEl.textContent=p>0?'+'+p+'pt':'0pt';pEl.className='a-pts '+(p>0?'pos':'zero');calcScore();}),
+        pts>0?'+'+pts+'pt':'0pt',pts>0?'pos':'zero'
+      );
+      wrap.appendChild(row);
+    });
+    lw.appendChild(wrap);
+  });
+  // Neutral
+  const nw=$('neutralActs');nw.innerHTML='';
+  NA.forEach(act=>{
+    const wrap=document.createElement('div');wrap.className='act-item';
+    const nm=document.createElement('div');nm.className='act-name';nm.textContent=act.name;
+    const ds=document.createElement('div');ds.className='act-desc';ds.textContent=act.desc;
+    wrap.append(nm,ds);
+    const{row,tv}=makeTimeRow(
+      '시간','neutral',st.na[act.id].mins,
+      ()=>{st.na[act.id].mins=Math.max(0,st.na[act.id].mins-25);tv.textContent=st.na[act.id].mins+'분';calcScore();},
+      ()=>{st.na[act.id].mins+=25;tv.textContent=st.na[act.id].mins+'분';calcScore();},
+      ()=>openTmodal(act.name,st.na[act.id].mins,v=>{st.na[act.id].mins=Math.max(0,v);tv.textContent=st.na[act.id].mins+'분';calcScore();}),
+      '기록만','ntrl'
+    );
+    wrap.appendChild(row);nw.appendChild(wrap);
+  });
+  // Waste
+  const ww=$('wasteActs');ww.innerHTML='';
+  WA.forEach(act=>{
+    const wrap=document.createElement('div');wrap.className='act-item';
+    const nm=document.createElement('div');nm.className='act-name';nm.textContent=act.name;
+    const ds=document.createElement('div');ds.className='act-desc';ds.textContent=act.desc;
+    wrap.append(nm,ds);
+    const pts=Math.round(act.p30*(st.wa[act.id].mins/30));
+    const{row,tv,pEl}=makeTimeRow(
+      '낭비','waste-lbl',st.wa[act.id].mins,
+      ()=>{st.wa[act.id].mins=Math.max(0,st.wa[act.id].mins-25);tv.textContent=st.wa[act.id].mins+'분';const p=Math.round(act.p30*(st.wa[act.id].mins/30));pEl.textContent=p>0?'−'+p+'pt':'0pt';calcScore();},
+      ()=>{st.wa[act.id].mins+=25;tv.textContent=st.wa[act.id].mins+'분';const p=Math.round(act.p30*(st.wa[act.id].mins/30));pEl.textContent=p>0?'−'+p+'pt':'0pt';calcScore();},
+      ()=>openTmodal(act.name,st.wa[act.id].mins,v=>{st.wa[act.id].mins=Math.max(0,v);tv.textContent=st.wa[act.id].mins+'분';const p=Math.round(act.p30*(st.wa[act.id].mins/30));pEl.textContent=p>0?'−'+p+'pt':'0pt';calcScore();}),
+      pts>0?'−'+pts+'pt':'0pt','neg'
+    );
+    wrap.appendChild(row);ww.appendChild(wrap);
+  });
+}
+
+// ─── Time Modal ──────────────────────────────────
+let tmodalCb=null;
+function openTmodal(label,cur,cb){
+  tmodalCb=cb;
+  $('tmodalTitle').textContent=label+' — 직접 입력';
+  $('tmodalInp').value=cur||'';
+  $('timeModal').classList.add('show');
+}
+$('btnTmodalOk').addEventListener('click',()=>{
+  const v=parseInt($('tmodalInp').value)||0;
+  if(tmodalCb)tmodalCb(v);
+  $('timeModal').classList.remove('show');tmodalCb=null;
+});
+$('btnTmodalCancel').addEventListener('click',()=>{$('timeModal').classList.remove('show');tmodalCb=null;});
+
+// ─── Sleep ───────────────────────────────────────
+function getSleepPts(){let p=0;if(checks.phone)p+=3;if(checks.book)p+=3;if(checks.prayer)p+=4;return p;}
+function getSleepPenalty(){
+  if(!sleepTime||dayType==='special')return 0;
+  const h=parseInt(sleepTime.split(':')[0]);
+  if(h>=21)return-10;if(h===0)return-10;if(h===1)return-20;if(h>=2&&h<4)return-30;
+  return 0;
+}
+function updateSleepCalc(){
+  const st2=sleepTime,wt=wakeTime;
+  if(!st2||!wt){$('sleepDur').textContent='—';$('sleepDur').style.color='var(--t2)';return;}
+  const[sh,sm]=st2.split(':').map(Number);
+  const[wh,wm]=wt.split(':').map(Number);
+  let mins=(wh*60+wm)-(sh*60+sm);if(mins<=0)mins+=1440;
+  const h=Math.floor(mins/60),m=mins%60;
+  const dur=$('sleepDur');
+  dur.textContent=`${h}시간${m>0?' '+m+'분':''}`;
+  dur.style.color=mins>=360?'var(--gr)':mins>=300?'var(--g)':'var(--r)';
+  // Completorium 경고
+  const cw=$('compWarn');
+  if(dayType!=='special'&&sh>=21||sh<4){
+    const pen=getSleepPenalty();
+    if(pen<0){cw.textContent=`😴 Completorium ${pen}pt 페널티`;cw.style.display='block';cw.style.background='#1a0808';cw.style.color='var(--r)';}
+    else{cw.style.display='none';}
+  }else{cw.style.display='none';}
+  calcScore();
+}
+$('sleepTime').addEventListener('change',e=>{sleepTime=e.target.value;updateSleepCalc();});
+$('wakeTime').addEventListener('change',e=>{wakeTime=e.target.value;updateSleepCalc();});
+['phone','book','prayer'].forEach(k=>{
+  $('chk-'+k).addEventListener('click',()=>{
+    checks[k]=!checks[k];
+    const box=$('box-'+k);
+    box.classList.toggle('on',checks[k]);
+    box.textContent=checks[k]?'✓':'';
+    calcScore();
+  });
+});
+function updateStreakUI(){
+  $('streakCount').textContent=`${streak}일 연속`;
+  $('streakBadge').textContent=`🔥 ${streak}일`;
+  const milestones=[3,7,14,30];
+  const next=milestones.find(m=>m>streak);
+  $('streakNext').textContent=next?`다음: ${next}일 (${next-streak}일 남음) +${SMILESTONE[next]}pt`:'🏆 30일 달성!';
+}
+$('btnSleepSave').addEventListener('click',async()=>{
+  if(!sleepTime||!wakeTime){toast('취침/기상 시간을 입력해줘');return;}
+  const[sh,sm]=sleepTime.split(':').map(Number);
+  const[wh,wm]=wakeTime.split(':').map(Number);
+  let mins=(wh*60+wm)-(sh*60+sm);if(mins<=0)mins+=1440;
+  const beforeMid=sh>=22||sh<4;
+  const enough=mins>=360;
+  const qualifies=beforeMid&&enough&&dayType!=='special';
+  const today=localDate(),yest=yesterday();
+  if(qualifies){
+    if(lastStreakDate===yest)streak++;
+    else if(lastStreakDate!==today)streak=1;
+    lastStreakDate=today;
+  }else if(dayType!=='special'&&lastStreakDate!==today){streak=0;}
+  let bonus=0;
+  [3,7,14,30].forEach(m=>{if(streak>=m&&!streakApplied.includes(m)){bonus+=SMILESTONE[m];streakApplied.push(m);toast(`🏆 ${m}일 streak! +${SMILESTONE[m]}pt`);}});
+  const rec={date:today,sleepTime,wakeTime,sleepMins:mins,checks:{...checks},streak,lastStreakDate,streakApplied:[...streakApplied],streakBonus:bonus,savedAt:new Date().toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})};
+  const ok=await fbSet('sleep_'+today,rec);
+  toast(ok?(qualifies?`✅ 저장! 🔥 ${streak}일 연속`:'✅ 수면 기록 저장됨'):'⚠️ 저장 실패');
+  updateStreakUI();calcScore();
+});
+
+// ─── Score ───────────────────────────────────────
+function calcScore(){
+  let sP=0,lP=0,pen=0,sM=0,lM=0,nM=0,wM=0;
+  SA.forEach(a=>IMP.forEach(i=>{sP+=calcPts(a.base,st.sa[a.id][i],i);sM+=st.sa[a.id][i];}));
+  LA.forEach(a=>IMP.forEach(i=>{lP+=calcPts(a.base,st.la[a.id][i],i);lM+=st.la[a.id][i];}));
+  NA.forEach(a=>{nM+=st.na[a.id].mins;});
+  WA.forEach(a=>{pen+=Math.round(a.p30*(st.wa[a.id].mins/30));wM+=st.wa[a.id].mins;});
+  const moq=st.moqDone.length*5;
+  const hora=startHora?(startHora.b[dayType]||0):0;
+  const slPts=getSleepPts();
+  const slPen=getSleepPenalty();
+  let lMult=1,warn='';
+  if(dayType==='buffer'){lMult=1;}
+  else{
+    const thr=THR[dayType];
+    if(sM>=thr){lMult=1;}
+    else if(sM>=thr*0.5){lMult=0.5;warn=`⚠️ 공부 ${Math.round((thr-sM)/60*10)/10}시간 더 필요 — 정신건강 50%만 반영`;}
+    else{lMult=0.2;warn=`⚠️ 공부 ${Math.round((thr-sM)/60*10)/10}시간 더 필요 — 정신건강 20%만 반영`;}
+  }
+  const adjL=Math.round(lP*lMult);
+  const earned=sP+adjL+slPts;
+  const raw=earned+moq+hora+slPen-pen;
+  const total=Math.min(Math.max(raw,0),MAX);
+  const wEl=$('warnMsg');wEl.textContent=warn;wEl.style.display=warn?'block':'none';
+  $('brkPlus').textContent='+'+(earned+moq);
+  $('brkHora').textContent=(hora>=0?'+':'')+hora;
+  $('brkHora').style.color=hora>0?'var(--g)':hora<0?'var(--r)':'var(--t2)';
+  $('brkMinus').textContent='−'+(pen+Math.abs(Math.min(slPen,0)));
+  $('brkTotal').textContent=total;
+  $('wasteTot').textContent='−'+pen+'pt';
+  $('stStudy').textContent=sM+'분';$('stLife').textContent=lM+'분';$('stNeutral').textContent=nM+'분';
+  $('stWaste').textContent=wM+'분';$('stHora').textContent=(hora>=0?'+':'')+hora+'pt';
+  $('stMoq').textContent=moq+'pt';$('stLost').textContent='−'+pen+'pt';
+  const pct=total/MAX;
+  $('ringFill').style.strokeDashoffset=377*(1-pct);
+  const c=pct>=.8?'#f5c842':pct>=.5?'#7c6dfa':pct>=.2?'#4ade80':'#55556a';
+  $('ringFill').style.stroke=c;$('scoreNum').textContent=total;$('scoreNum').style.color=c;$('brkTotal').style.color=c;
+  const g=grade(total);
+  const bg=$('gradeBadge');bg.textContent=g.t;bg.style.color=g.c;bg.style.background=g.bg;bg.style.border=`1px solid ${g.c}40`;
+  return total;
+}
+
+// ─── Save ────────────────────────────────────────
+$('btnSave').addEventListener('click',async()=>{
+  const score=calcScore();
+  const date=$('recordDate').value||localDate();
+  const rec={date,score,dayType,startHoraName:startHora?.name||null,startTime:startTimeStr,
+    sa:JSON.parse(JSON.stringify(st.sa)),la:JSON.parse(JSON.stringify(st.la)),
+    na:JSON.parse(JSON.stringify(st.na)),wa:JSON.parse(JSON.stringify(st.wa)),
+    moqDone:[...st.moqDone],savedAt:new Date().toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})};
+  toast('💾 저장 중...');
+  const ok=await fbSet(date,rec);
+  toast(ok?'✅ 저장됐어!':'⚠️ 저장 실패');
+});
+
+// ─── Reset ───────────────────────────────────────
+$('btnReset').addEventListener('click',()=>{
+  if(!confirm('초기화할까?'))return;
+  SA.forEach(a=>{st.sa[a.id]={high:0,mid:0,low:0};});
+  LA.forEach(a=>{st.la[a.id]={high:0,mid:0,low:0};});
+  NA.forEach(a=>{st.na[a.id]={mins:0};});
+  WA.forEach(a=>{st.wa[a.id]={mins:0};});
+  st.moqDone=[];startHora=null;startTimeStr=null;
+  dayType='normal';
+  ['work','special','buffer'].forEach(x=>$('btn'+x.charAt(0).toUpperCase()+x.slice(1)).classList.remove('on'));
+  $('thrInfo').textContent='공부 기준: 11시간 (일 없는 날)';
+  $('recordDate').value=localDate();
+  $('btnStart').style.display='block';$('startRec').style.display='none';
+  renderMoq();renderActs();updateHora();updateSessionUI();calcScore();
+  toast('🔄 새 하루 시작!');
+});
+
+// ─── History ─────────────────────────────────────
+async function loadHistory(){
+  const w=$('historyList');w.innerHTML='<div class="empty">불러오는 중...</div>';
+  const history=await fbList();
+  renderGraph(graphMode,history);
+  if(!history.length){w.innerHTML='<div class="empty">아직 저장된 기록이 없어요</div>';return;}
+  w.innerHTML='';
+  history.forEach(h=>{
+    const item=document.createElement('div');item.className='hist-item';
+    const g=h.score>=250?'🏆':h.score>=200?'⭐':h.score>=150?'✅':h.score>=80?'📝':'🌱';
+    const c=h.score>=200?'#f5c842':h.score>=150?'#7c6dfa':h.score>=80?'#4ade80':'#8888a8';
+    const d=new Date(h.date+'T00:00:00');
+    const ds=d.toLocaleDateString('ko-KR',{month:'long',day:'numeric',weekday:'short'});
+    item.innerHTML=`<span class="hist-date">${ds}</span><div><span class="hist-score" style="color:${c}">${h.score}pt</span><span class="hist-grade">${g}</span></div>`;
+    item.addEventListener('click',()=>openModal(h));
+    w.appendChild(item);
+  });
+}
+$('btnLoad').addEventListener('click',async()=>{
+  const date=$('loadDate').value;if(!date){toast('날짜를 선택해줘');return;}
+  toast('🔄 불러오는 중...');const data=await fbGet(date);
+  if(!data){toast('❌ 해당 날짜 기록이 없어');return;}openModal(data);
+});
+
+// ─── Modal ───────────────────────────────────────
+function openModal(data){
+  modalRec=data;
+  const d=new Date(data.date+'T00:00:00');
+  $('modalDate').textContent=d.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'short'});
+  const s=data.score||0;const g=grade(s);
+  $('modalScore').textContent=s+'pt';$('modalScore').style.color=g.c;
+  $('modalGrade').textContent=g.t;$('modalGrade').style.color=g.c;
+  const c=$('modalContent');c.innerHTML='';
+  const sec=(title,acts,obj,type)=>{
+    if(!obj)return;
+    const has=acts.some(a=>{const s=obj[a.id];if(!s)return false;return type==='neutral'||type==='waste'?s.mins>0:IMP.some(i=>s[i]>0);});
+    if(!has)return;
+    const t=document.createElement('div');t.className='modal-sec';t.textContent=title;c.appendChild(t);
+    acts.forEach(act=>{
+      const s=obj[act.id];if(!s)return;
+      if(type==='neutral'||type==='waste'){if(!s.mins)return;const r=document.createElement('div');r.className='modal-row';r.innerHTML=`<span>${act.name}</span><span style="color:${type==='waste'?'var(--r)':'var(--t2)'}">${s.mins}분</span>`;c.appendChild(r);}
+      else{IMP.forEach(i=>{const m=s[i]||0;if(!m)return;const r=document.createElement('div');r.className='modal-row';const ic=i==='high'?'var(--a)':i==='mid'?'var(--g)':'var(--gr)';r.innerHTML=`<span>${act.name} <span style="font-size:10px;color:${ic}">[${ILBL[i]}]</span></span><span style="color:var(--g)">${m}분</span>`;c.appendChild(r);});}
+    });
+  };
+  sec('💻 공부',SA,data.sa,'study');sec('🌱 정신건강',LA,data.la,'life');
+  sec('⏱️ 필수',NA,data.na,'neutral');sec('📵 낭비',WA,data.wa,'waste');
+  if(data.moqDone?.length){const t=document.createElement('div');t.className='modal-sec';t.textContent='📋 모의고사';c.appendChild(t);const r=document.createElement('div');r.className='modal-row';r.innerHTML=`<span>완료 회차</span><span style="color:var(--a)">${[...data.moqDone].sort((a,b)=>a-b).join(', ')}회</span>`;c.appendChild(r);}
+  $('detailModal').style.display='block';document.body.style.overflow='hidden';
+}
+$('btnModalClose').addEventListener('click',()=>{$('detailModal').style.display='none';document.body.style.overflow='';modalRec=null;});
+$('btnModalLoad').addEventListener('click',()=>{
+  if(!modalRec)return;const d=modalRec;
+  const restore=(acts,key,src)=>acts.forEach(a=>{const s=src[a.id];if(!s)return;st[key][a.id]=typeof s.high!=='undefined'?{high:s.high||0,mid:s.mid||0,low:s.low||0}:{high:0,mid:s.mins||0,low:0};});
+  restore(SA,'sa',d.sa||{});restore(LA,'la',d.la||{});
+  if(d.na)Object.assign(st.na,d.na);if(d.wa)Object.assign(st.wa,d.wa);
+  if(d.moqDone)st.moqDone=[...d.moqDone];
+  if(d.dayType&&d.dayType!=='normal')setDayType(d.dayType);
+  $('recordDate').value=d.date;
+  $('detailModal').style.display='none';document.body.style.overflow='';modalRec=null;
+  renderMoq();renderActs();updateSessionUI();calcScore();
+  showPage('main');toast('✅ 기록 불러왔어!');
+});
+
+// ─── Graph ───────────────────────────────────────
+function renderGraph(mode,history=[]){
+  cachedHistory=history;
+  function toStr(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+  const today=new Date();today.setHours(0,0,0,0);
+  let slots=[];
+  if(mode==='weekly'){for(let i=6;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);slots.push({date:toStr(d),label:['일','월','화','수','목','금','토'][d.getDay()]});}}
+  else{for(let i=29;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);const day=d.getDate();slots.push({date:toStr(d),label:day%5===1?String(day):''}); }}
+  const sm={};history.forEach(h=>{sm[h.date]=h.score;});
+  const scores=slots.map(s=>sm[s.date]!==undefined?sm[s.date]:null);
+  const rec=scores.filter(s=>s!==null);
+  $('gAvg').textContent=rec.length?Math.round(rec.reduce((a,b)=>a+b,0)/rec.length)+'pt':'—';
+  $('gMax').textContent=rec.length?Math.max(...rec)+'pt':'—';
+  $('gDays').textContent=rec.length+'일';
+  const canvas=$('graphCanvas');
+  const dpr=window.devicePixelRatio||1;
+  const W=canvas.parentElement.clientWidth,H=180;
+  canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';
+  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  const P={t:16,r:16,b:32,l:40};const gW=W-P.l-P.r,gH=H-P.t-P.b,n=slots.length;
+  ctx.clearRect(0,0,W,H);
+  [{min:250,max:300,c:'rgba(245,200,66,.06)'},{min:200,max:250,c:'rgba(124,109,250,.07)'},{min:150,max:200,c:'rgba(74,222,128,.06)'},{min:80,max:150,c:'rgba(96,165,250,.05)'}].forEach(z=>{ctx.fillStyle=z.c;ctx.fillRect(P.l,P.t+gH-(z.max/300)*gH,gW,(z.max-z.min)/300*gH);});
+  [0,100,200,300].forEach(v=>{const y=P.t+gH-(v/300)*gH;ctx.strokeStyle='#2e2e3e';ctx.lineWidth=1;ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(P.l+gW,y);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#55556a';ctx.font='9px Space Mono,monospace';ctx.textAlign='right';ctx.fillText(v,P.l-5,y+3);});
+  slots.forEach((s,i)=>{if(!s.label)return;const x=P.l+(i/(n-1))*gW;ctx.fillStyle='#8888a8';ctx.font='9px Noto Sans KR,sans-serif';ctx.textAlign='center';ctx.fillText(s.label,x,H-6);});
+  const pts=scores.map((sc,i)=>({x:P.l+(i/(n-1))*gW,y:sc!==null?P.t+gH-(sc/300)*gH:null}));
+  const bw=Math.max(4,gW/n*.5);
+  pts.forEach(p=>{if(p.y===null)return;const bh=P.t+gH-p.y;const gr2=ctx.createLinearGradient(0,p.y,0,P.t+gH);gr2.addColorStop(0,'rgba(124,109,250,.5)');gr2.addColorStop(1,'rgba(124,109,250,.05)');ctx.fillStyle=gr2;ctx.beginPath();if(ctx.roundRect)ctx.roundRect(p.x-bw/2,p.y,bw,bh,3);else ctx.rect(p.x-bw/2,p.y,bw,bh);ctx.fill();});
+  ctx.strokeStyle='#7c6dfa';ctx.lineWidth=2;ctx.lineJoin='round';ctx.setLineDash([]);let started=false;ctx.beginPath();pts.forEach(p=>{if(p.y===null){started=false;return;}if(!started){ctx.moveTo(p.x,p.y);started=true;}else ctx.lineTo(p.x,p.y);});ctx.stroke();
+  pts.forEach(p=>{if(p.y===null)return;ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fillStyle='#fa6d8a';ctx.fill();ctx.strokeStyle='#0f0f13';ctx.lineWidth=2;ctx.stroke();});
+  const ts=toStr(today);const ti=slots.findIndex(s=>s.date===ts);if(ti>=0){const tx=pts[ti].x;ctx.strokeStyle='#f5c842';ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(tx,P.t);ctx.lineTo(tx,P.t+gH);ctx.stroke();ctx.setLineDash([]);}
+  if(!rec.length){ctx.fillStyle='#55556a';ctx.font='12px Noto Sans KR,sans-serif';ctx.textAlign='center';ctx.fillText('저장된 기록이 없어요',W/2,H/2);}
+}
+$('tabWeekly').addEventListener('click',()=>{graphMode='weekly';$('tabWeekly').classList.add('active');$('tabMonthly').classList.remove('active');renderGraph('weekly',cachedHistory);});
+$('tabMonthly').addEventListener('click',()=>{graphMode='monthly';$('tabMonthly').classList.add('active');$('tabWeekly').classList.remove('active');renderGraph('monthly',cachedHistory);});
+
+// ─── Settings ────────────────────────────────────
+$('btnSaveSettings').addEventListener('click',async()=>{
+  sets={minN:parseInt($('setMinN').value)||2,chalN:parseInt($('setChalN').value)||8,minW:parseInt($('setMinW').value)||1,chalW:parseInt($('setChalW').value)||4,minS:parseInt($('setMinS').value)||1,chalS:parseInt($('setChalS').value)||3};
+  const ok=await fbSet('config_settings',{...sets,savedAt:new Date().toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})});
+  toast(ok?'✅ 설정 저장됐어!':'⚠️ 저장 실패');updateSessionUI();
+});
+
+// ─── Init ────────────────────────────────────────
+$('dateStr').textContent=new Date().toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric',weekday:'long'}).toUpperCase();
+$('recordDate').value=localDate();
+$('loadDate').value=localDate();
+renderMoq();
+renderActs();
+updateHora();
+updateSessionUI();
+calcScore();
+
+(async()=>{
+  // 설정 불러오기
+  const savedSets=await fbGet('config_settings');
+  if(savedSets){Object.assign(sets,savedSets);$('setMinN').value=sets.minN;$('setChalN').value=sets.chalN;$('setMinW').value=sets.minW;$('setChalW').value=sets.chalW;$('setMinS').value=sets.minS;$('setChalS').value=sets.chalS;updateSessionUI();}
+  // 오늘 수면 데이터
+  const today=localDate(),yest=yesterday();
+  const sleepData=await fbGet('sleep_'+today);
+  if(sleepData){
+    sleepTime=sleepData.sleepTime||null;wakeTime=sleepData.wakeTime||null;
+    if(sleepTime)$('sleepTime').value=sleepTime;if(wakeTime)$('wakeTime').value=wakeTime;
+    Object.assign(checks,sleepData.checks||{});
+    ['phone','book','prayer'].forEach(k=>{$('box-'+k).classList.toggle('on',checks[k]);$('box-'+k).textContent=checks[k]?'✓':'';});
+    streak=sleepData.streak||0;lastStreakDate=sleepData.lastStreakDate||null;streakApplied=sleepData.streakApplied||[];
+    updateSleepCalc();updateStreakUI();
+  }else{
+    const yd=await fbGet('sleep_'+yest);
+    if(yd){streak=yd.streak||0;lastStreakDate=yd.lastStreakDate||null;streakApplied=yd.streakApplied||[];updateStreakUI();}
+  }
+  // 오늘 기록 불러오기
+  toast('🔄 불러오는 중...');
+  const data=await fbGet(today);
+  if(data){
+    const restore=(acts,key,src)=>acts.forEach(a=>{const s=src&&src[a.id];if(!s)return;st[key][a.id]=typeof s.high!=='undefined'?{high:s.high||0,mid:s.mid||0,low:s.low||0}:{high:0,mid:s.mins||0,low:0};});
+    restore(SA,'sa',data.sa);restore(LA,'la',data.la);
+    if(data.na)Object.assign(st.na,data.na);if(data.wa)Object.assign(st.wa,data.wa);
+    if(data.moqDone)st.moqDone=data.moqDone;
+    if(data.dayType&&data.dayType!=='normal')setDayType(data.dayType);
+    if(data.startHoraName){startHora=HORAS.find(h=>h.name===data.startHoraName)||null;startTimeStr=data.startTime||null;if(startHora){$('btnStart').style.display='none';$('startRec').textContent=`${startHora.name} · ${startTimeStr}`;$('startRec').style.display='block';$('startRec').style.color=startHora.c;}}
+    renderMoq();renderActs();updateSessionUI();calcScore();
+    toast('✅ 오늘 기록 불러왔어!');
+  }else{toast('📝 새로운 하루 시작!');}
+  // 그래프
+  const history=await fbList();
+  renderGraph('weekly',history);
+})();
+</script>
+</body>
+</html>
